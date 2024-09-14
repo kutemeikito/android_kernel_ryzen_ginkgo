@@ -340,7 +340,7 @@ def run_headers_install(verbose, gen_dir, headers_install, unifdef, prefix, h):
   (out_h_dirname, out_h_basename) = os.path.split(out_h)
   h_dirname = os.path.dirname(h)
 
-  cmd = [headers_install, out_h_dirname, h_dirname, out_h_basename]
+  cmd = ["sh", headers_install, out_h_dirname, h_dirname, out_h_basename]
 
   if verbose:
     print('run_headers_install: cmd is %s' % cmd)

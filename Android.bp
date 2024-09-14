@@ -13,11 +13,10 @@ genrule {
     cmd: "sed 's+scripts/unifdef+$$LOC_UNIFDEF+g' $(in) > $(out)",
 }
 
-cc_prebuilt_binary {
+sh_binary_host {
     name: "headers_install.sh",
-    device_supported: false,
-    host_supported: true,
-    srcs: [":gen-headers_install.sh"],
+    src: ":gen-headers_install.sh",
+    required: ["unifdef"],
 }
 
 // Use the following for verbose output from kernel_headers.py.
