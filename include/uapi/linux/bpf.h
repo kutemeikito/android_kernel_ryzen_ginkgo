@@ -115,6 +115,9 @@ enum bpf_map_type {
 	BPF_MAP_TYPE_DEVMAP,
 	BPF_MAP_TYPE_SOCKMAP,
 	BPF_MAP_TYPE_DEVMAP_HASH = 25,
+#ifdef CONFIG_ANDROID_SPOOF_KERNEL_VERSION_FOR_BPF
+	BPF_MAP_TYPE_DUMMY = 255,
+#endif
 };
 
 enum bpf_prog_type {
@@ -134,6 +137,9 @@ enum bpf_prog_type {
 	BPF_PROG_TYPE_SOCK_OPS,
 	BPF_PROG_TYPE_SK_SKB,
 	BPF_PROG_TYPE_CGROUP_SOCK_ADDR = 18,
+#ifdef CONFIG_ANDROID_SPOOF_KERNEL_VERSION_FOR_BPF
+	BPF_PROG_TYPE_DUMMY = 255,
+#endif
 };
 
 enum bpf_attach_type {
@@ -147,6 +153,12 @@ enum bpf_attach_type {
 	BPF_CGROUP_INET6_BIND = 9,
 	BPF_CGROUP_INET4_CONNECT,
 	BPF_CGROUP_INET6_CONNECT,
+	BPF_CGROUP_INET4_POST_BIND,
+	BPF_CGROUP_INET6_POST_BIND,
+	BPF_CGROUP_UDP4_SENDMSG,
+	BPF_CGROUP_UDP6_SENDMSG,
+	BPF_CGROUP_UDP4_RECVMSG = 19,
+	BPF_CGROUP_UDP6_RECVMSG = 20,
 	__MAX_BPF_ATTACH_TYPE
 };
 
@@ -953,6 +965,15 @@ struct bpf_sock {
 	__u32 protocol;
 	__u32 mark;
 	__u32 priority;
+	__u32 src_ip4;		/* Allows 1,2,4-byte read.
+				 * Stored in network byte order.
+				 */
+	__u32 src_ip6[4];	/* Allows 1,2,4-byte read.
+				 * Stored in network byte order.
+				 */
+	__u32 src_port;		/* Allows 4-byte read.
+				 * Stored in host byte order
+				 */
 };
 
 #define XDP_PACKET_HEADROOM 256
@@ -1028,6 +1049,12 @@ struct bpf_sock_addr {
 	__u32 family;		/* Allows 4-byte read, but no write */
 	__u32 type;		/* Allows 4-byte read, but no write */
 	__u32 protocol;		/* Allows 4-byte read, but no write */
+	__u32 msg_src_ip4;	/* Allows 1,2,4-byte read an 4-byte write.
+				 * Stored in network byte order.
+				 */
+	__u32 msg_src_ip6[4];	/* Allows 1,2,4-byte read an 4-byte write.
+				 * Stored in network byte order.
+				 */
 };
 
 /* User bpf_sock_ops struct to access socket values and specify request ops

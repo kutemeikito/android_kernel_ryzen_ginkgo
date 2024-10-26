@@ -498,6 +498,10 @@ struct bpf_prog {
 		struct sock_filter	insns[0];
 		struct bpf_insn		insnsi[0];
 	};
+
+#ifdef CONFIG_ANDROID_SPOOF_KERNEL_VERSION_FOR_BPF
+	bool 			disabled;	/* If set this program should not be executed */
+#endif
 };
 
 struct sk_filter {
@@ -1051,6 +1055,7 @@ struct bpf_sock_addr_kern {
 	 * only two (src and dst) are available at convert_ctx_access time
 	 */
 	u64 tmp_reg;
+	void *t_ctx;	/* Attach type specific context. */
 };
 
 struct bpf_sock_ops_kern {

@@ -3618,6 +3618,48 @@ static int check_ld_abs(struct bpf_verifier_env *env, struct bpf_insn *insn)
 	return 0;
 }
 
+static int check_return_code(struct bpf_verifier_env *env)
+{
+	struct bpf_reg_state *reg;
+	struct tnum range = tnum_range(0, 1);
+
+	switch (env->prog->type) {
+	case BPF_PROG_TYPE_CGROUP_SOCK_ADDR:
+		if (env->prog->expected_attach_type == BPF_CGROUP_UDP4_RECVMSG ||
+		    env->prog->expected_attach_type == BPF_CGROUP_UDP6_RECVMSG)
+			range = tnum_range(1, 1);
+	case BPF_PROG_TYPE_CGROUP_SKB:
+	case BPF_PROG_TYPE_CGROUP_SOCK:
+	case BPF_PROG_TYPE_SOCK_OPS:
+		break;
+	default:
+		return 0;
+	}
+
+	reg = &env->cur_state->regs[BPF_REG_0];
+	if (reg->type != SCALAR_VALUE) {
+		verbose("At program exit the register R0 is not a known value (%s)\n",
+			reg_type_str[reg->type]);
+		return -EINVAL;
+	}
+
+	if (!tnum_in(range, reg->var_off)) {
+		char tn_buf[48];
+
+		verbose("At program exit the register R0 ");
+		if (!tnum_is_unknown(reg->var_off)) {
+			tnum_strn(tn_buf, sizeof(tn_buf), reg->var_off);
+			verbose("has value %s", tn_buf);
+		} else {
+			verbose("has unknown scalar value");
+		}
+		tnum_strn(tn_buf, sizeof(tn_buf), range);
+		verbose(" should have been in %s\n", tn_buf);
+		return -EINVAL;
+	}
+	return 0;
+}
+
 /* non-recursive DFS pseudo code
  * 1  procedure DFS-iterative(G,v):
  * 2      label v as discovered
@@ -4460,6 +4502,9 @@ static int do_check(struct bpf_verifier_env *env)
 					return -EACCES;
 				}
 
+				err = check_return_code(env);
+				if (err)
+					return err;
 process_bpf_exit:
 				err = pop_stack(env, &env->prev_insn_idx, &env->insn_idx);
 				if (err < 0) {
