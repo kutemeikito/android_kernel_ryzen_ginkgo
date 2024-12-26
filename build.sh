@@ -66,6 +66,7 @@ echo -e "\nKSU Support, let's Make it On\n"
 curl -kLSs "https://raw.githubusercontent.com/rifsxd/KernelSU-Next/next/kernel/setup.sh" | bash -s next-susfs-4.14
 git apply KernelSU-hook.patch
 sed -i 's/CONFIG_KSU=n/CONFIG_KSU=y/g' arch/arm64/configs/vendor/ginkgo-perf_defconfig
+sed -i 's/CONFIG_KSU_SUSFS_SUS_SU=n/CONFIG_KSU_SUSFS_SUS_SU=y/g' arch/arm64/configs/vendor/ginkgo-perf_defconfig
 sed -i 's/CONFIG_LOCALVERSION="-RyzenKernel-Dynamic"/CONFIG_LOCALVERSION="-RyzenKernel-Dynamic-KSU"/g' arch/arm64/configs/vendor/ginkgo-perf_defconfig
 else
 echo -e "\nKSU not Support, let's Skip\n"
