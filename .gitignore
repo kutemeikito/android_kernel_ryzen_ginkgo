@@ -138,5 +138,6 @@ gcc32/
 out/
 
 # Ignore KernelSU folders
-KernelSU/
+KernelSU-Next/
 drivers/kernelsu
+
