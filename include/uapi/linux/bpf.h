@@ -115,9 +115,6 @@ enum bpf_map_type {
 	BPF_MAP_TYPE_DEVMAP,
 	BPF_MAP_TYPE_SOCKMAP,
 	BPF_MAP_TYPE_DEVMAP_HASH = 25,
-#ifdef CONFIG_ANDROID_SPOOF_KERNEL_VERSION_FOR_BPF
-	BPF_MAP_TYPE_DUMMY = 255,
-#endif
 };
 
 enum bpf_prog_type {
