@@ -586,16 +586,11 @@ int susfs_set_uname(struct st_susfs_uname* __user user_info) {
 	return 0;
 }
 
-int susfs_spoof_uname(struct new_utsname* tmp) {
+void susfs_spoof_uname(struct new_utsname* tmp) {
 	if (unlikely(my_uname.release[0] == '\0' || spin_is_locked(&susfs_uname_spin_lock)))
-		return 1;
-	strncpy(tmp->sysname, utsname()->sysname, __NEW_UTS_LEN);
-	strncpy(tmp->nodename, utsname()->nodename, __NEW_UTS_LEN);
+		return;
 	strncpy(tmp->release, my_uname.release, __NEW_UTS_LEN);
 	strncpy(tmp->version, my_uname.version, __NEW_UTS_LEN);
-	strncpy(tmp->machine, utsname()->machine, __NEW_UTS_LEN);
-	strncpy(tmp->domainname, utsname()->domainname, __NEW_UTS_LEN);
-	return 0;
 }
 #endif // #ifdef CONFIG_KSU_SUSFS_SPOOF_UNAME
 
